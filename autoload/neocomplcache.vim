@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 04 Feb 2011.
+" Last Modified: 05 Feb 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -24,14 +24,6 @@
 " }}}
 " Version: 6.0, for Vim 7.0
 "=============================================================================
-
-" Check vimproc.
-try
-  call vimproc#version()
-  let s:exists_vimproc = 1
-catch
-  let s:exists_vimproc = 0
-endtry
 
 if !exists('s:is_enabled')
   let s:is_enabled = 0
@@ -838,33 +830,9 @@ function! neocomplcache#rand(max)"{{{
   let l:time = reltime()[1]
   return (l:time < 0 ? -l:time : l:time)% (a:max + 1)
 endfunction"}}}
-function! neocomplcache#system(str, ...)"{{{
-  let l:command = a:str
-  let l:input = a:0 >= 1 ? a:1 : ''
-  if has('iconv') && &termencoding != '' && &termencoding != &encoding
-    let l:command = iconv(l:command, &encoding, &termencoding)
-    let l:input = iconv(l:input, &encoding, &termencoding)
-  endif
-
-  if !s:exists_vimproc
-    if a:0 == 0
-      let l:output = system(l:command)
-    else
-      let l:output = system(l:command, l:input)
-    endif
-  elseif a:0 == 0
-    let l:output = vimproc#system(l:command)
-  elseif a:0 == 1
-    let l:output = vimproc#system(l:command, l:input)
-  else
-    let l:output = vimproc#system(l:command, l:input, a:2)
-  endif
-
-  if has('iconv') && &termencoding != '' && &termencoding != &encoding
-    let l:output = iconv(l:output, &termencoding, &encoding)
-  endif
-
-  return l:output
+let s:vital = vital#latest(expand('<sfile>:r'))
+function! neocomplcache#system(...)"{{{
+  return call('system', a:000, s:vital)
 endfunction"}}}
 
 function! neocomplcache#get_cur_text(...)"{{{
